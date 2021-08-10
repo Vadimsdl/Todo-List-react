@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import UserList from './component/UserList';
-import Cuntent from './context/Content'
+import Content from './context/Content'
 import { v4 as uuidv4 } from 'uuid';
 import './App.css'
 
@@ -23,26 +23,48 @@ function App() {
     setTasks(tasks => addListElem({tasks, id, title}));
   }
 
-  const removeSublist = ({tasks, id, parentId = null}) => {
-    return tasks.map(task => {
-      
-      if (!!parentId) {
-        if (task.id === id) {
-          return {...task, sublist: [] };
-        } else return {...task, sublist: removeSublist({tasks: task.sublist, id, parentId})};  
-      } else {
+  const deleteSublist = (id) => {
+    setTasks(tasks => removeSublist({tasks, id}));
+  }
 
-        if (task.id === id) {
-         
-          return {...task};
-        } else return {...task, sublist: removeSublist({tasks: task.sublist, id})}; 
+  const removeSublist = ({tasks, id}) => {
+    return tasks.map(task => {
+      if (task.id === id) {
+        return {...task, sublist: []};
+      } else return {...task, sublist: removeSublist({tasks: task.sublist, id})};
+    });
+  }
+
+  const deleteTask = (id) => {
+    setTasks(tasks => removeTask({tasks, id}));
+  }
+
+  const removeTask = ({tasks, id}) => {
+    return tasks.filter(task => {
+      if (task.id === id) {
+        return false;
+      } else {
+        task.sublist = removeTask({tasks: task.sublist, id});
+        return true;
       }
     });
   }
 
-  const deleteItems = (id, parentId = null) => {
-    setTasks(tasks => removeSublist({tasks, id, parentId}));
-    console.log(tasks)
+  const setUp = (id) => {
+    setTasks(tasks => moveUp({tasks, id}))
+    console.log(moveUp({tasks, id}))
+  }
+  
+  const moveUp = ({tasks, id, taskNew=[]}) => {
+    const p = tasks.map((task, idx) => { 
+      console.log(task, 1);
+      if (task.id === id) {
+        const text = tasks.splice(idx-1, 1, task);
+        tasks.splice(idx, 1, text[0]);
+        return tasks;
+      } else return {...task, sublist: moveUp({tasks: task.sublist, id})};
+    })
+    return p;
   }
 
   return (
@@ -51,7 +73,9 @@ function App() {
       tasks={tasks}
       setTasks={setTasks}
       addListElem={setItems}
-      removeSublist={deleteItems}
+      deleteSublist={deleteSublist}
+      removeTask={deleteTask}
+      setUp={setUp}
       />
     </div>
   );

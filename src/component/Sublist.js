@@ -1,24 +1,21 @@
 import React from 'react';
 import UserList from './UserList'
 
-function Sublist({index, taskTitle, task, setTasks, removeSublist, tasks, addListElem }) {
+function Sublist({index, taskTitle, task, setTasks, deleteSublist, tasks, addListElem, removeTask, setUp }) {
   let getTasks = task.sublist;
 
   const clickRemoveTask = (task) => () => {
-    removeSublist(task.id);
+    removeTask(task.id);
   }
 
   const clickRemoveSublist = (task) => () => {
-    removeSublist(task.id, tasks.id);
+    deleteSublist(task.id);
   }
 
   function clickUp(id, val) {
     
     if (id-1 !== -1) {
-      const text = tasks.splice(id-1, 1, val);
-      tasks.splice(id, 1, text[0]);
-      setTasks([...tasks]);
-      getTasks = tasks;
+      setUp(task.id)
     }
   }
 
@@ -47,7 +44,9 @@ function Sublist({index, taskTitle, task, setTasks, removeSublist, tasks, addLis
           setTasks={setTasks}
           id={task.id}
           taskTitle={taskTitle}
-          removeSublist={removeSublist}
+          deleteSublist={deleteSublist}
+          removeTask={removeTask}
+          setUp={setUp}
         />
     </li>
   );

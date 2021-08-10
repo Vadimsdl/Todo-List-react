@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import Sublist from './Sublist';
 
-function UserList({tasks, setTasks, addListElem, id = null, removeSublist}) {
+function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, removeTask, setUp}) {
 	const [getValue, setValue] = useState('');
-	
+
 	const changeAddTask = (e) => { 
 		setValue(e.target.value);
 	}
+	console.log(tasks);
 
 	const clickAddTask = () => {
 		addListElem({id, title: getValue});
 		setValue('');
 	}
-
-	console.log(tasks)
 
 	return (
 		<ul className="items-li">
@@ -27,7 +26,9 @@ function UserList({tasks, setTasks, addListElem, id = null, removeSublist}) {
 						tasks={tasks}
 						setTasks={setTasks}
 						addListElem={addListElem}
-						removeSublist={removeSublist}
+						deleteSublist={deleteSublist}
+						removeTask={removeTask}
+						setUp={setUp}
 						/>
 					);
 				}
