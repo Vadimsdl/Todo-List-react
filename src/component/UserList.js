@@ -1,39 +1,35 @@
 import React, { useState } from 'react';
-import './UserList.css';
 import Sublist from './Sublist';
-import { v4 as uuidv4 } from 'uuid';
 
-function UserList({tasks, setTasks, addListElem, subl, oldTask=[], valu, id = null}) {
+function UserList({tasks, setTasks, addListElem, id = null, removeSublist}) {
+	const [getValue, setValue] = useState('');
 	
-	const changeTask = (e) => { 
-
-		if (e.target.value) {
-			addListElem({id, title: e.target.value});
-			e.target.value = '';
-		}
-
+	const changeAddTask = (e) => { 
+		setValue(e.target.value);
 	}
 
-//  console.log(tasks)
+	const clickAddTask = () => {
+		addListElem({id, title: getValue});
+		setValue('');
+	}
+
+	console.log(tasks)
 
 	return (
-		<ul>
+		<ul className="items-li">
 			{tasks.map((task, index) => {
-				// console.log(tasks)
 					return (
 						<Sublist 
 						key={index}
-						val={task.title}
+						taskTitle={task.title}
 						task={task}
 						index={index}
 						tasks={tasks}
 						setTasks={setTasks}
 						addListElem={addListElem}
-						id={task.id}
-
-						//action={addRemoveElement}
+						removeSublist={removeSublist}
 						/>
-					)
+					);
 				}
 			)}
 			<li>
@@ -42,9 +38,10 @@ function UserList({tasks, setTasks, addListElem, subl, oldTask=[], valu, id = nu
 					name="task-name"
 					className="task-name"
 					id="task-name"
-					onBlur = {changeTask}
+					value={getValue}
+					onChange={changeAddTask}
 				/>
-				<button type="button" className="add-btn" >Add</button>
+				<button type="button" className="btn" onClick={clickAddTask} >Add</button>
 			</li>
 		</ul>
 	);

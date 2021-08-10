@@ -1,64 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import UserList from './UserList'
 
-function Sublist(props) {
-  const [sublistInput, setSublistInput] = useState([]);
-  const idx = props.index;
-  const valu = props.val;
-  let tasks = props.task.sublist;
+function Sublist({index, taskTitle, task, setTasks, removeSublist, tasks, addListElem }) {
+  let getTasks = task.sublist;
 
-  function clickAddInput(id, e) {
-    // setSublistInput([
-    //   ...sublistInput,
-    //   id
-    // ]);
-    // //<UserList/>
+  const clickRemoveTask = (task) => () => {
+    removeSublist(task.id);
   }
 
-  const clickRemoveTask = (value, index) => () => {
-    props.setTask(prevIndexes => [...prevIndexes.filter((item, id) => id !== index)]);
+  const clickRemoveSublist = (task) => () => {
+    removeSublist(task.id, tasks.id);
   }
 
-  function clickRemoveSublist (e) {
-    //console.log(props.taskName, valu);
-    //props.addRemoveElement(props.arr, 'remove');
-  }
-
-  function clickUp(e, id, val) {
-    if (id-1 !== -1) {
-      const text = props.tasks.splice(id-1, 1, val);
-      props.tasks.splice(id, 1, text[0]);
-      props.setTasks([...props.tasks]);
-      console.log(id); 
-      tasks = props.task;
-        //e.target.classList.toggle('hidden');
-    }
+  function clickUp(id, val) {
     
+    if (id-1 !== -1) {
+      const text = tasks.splice(id-1, 1, val);
+      tasks.splice(id, 1, text[0]);
+      setTasks([...tasks]);
+      getTasks = tasks;
+    }
   }
 
   function clickDown(id, val) {
-    const text = props.tasks.splice(id+1, 1, val);
-    props.tasks.splice(id, 1, text[0]);
-    props.setTasks([...props.tasks]);
-    tasks = props.task;
+  
+    if ( id < tasks.length-1 ) {
+      const text = tasks.splice(id+1, 1, val);
+      tasks.splice(id, 1, text[0]);
+      setTasks([...tasks]);
+      getTasks = tasks;
+    }
   }
 
   return (
     <li >
-      <button type="button" onClick={(e) => clickUp(e, idx, valu)}>Up</button>
-      <button type="button" onClick={() => clickDown(idx, valu)}>Down</button>
-      <span>{valu}</span>
-      <button type="button" className="add-btn-sublist" onClick={() => clickAddInput(props.id)}>Add Sublist</button>
-      <button type="button" onClick={clickRemoveTask(valu, idx)}>Delete</button>
-      <button type="button" onClick={clickRemoveSublist}>Remove Sublist</button>
+      <div className="title-block">
+      <span className="title-task">{taskTitle}</span>
+      </div>
+      <button className="btn" type="button" onClick={() => clickUp(index, task)}>Up</button>
+      <button className="btn" type="button" onClick={() => clickDown(index, task)}>Down</button>
+      <button className="btn" type="button" onClick={clickRemoveTask(task)}>Delete</button>
+      <button className="btn" type="button" onClick={clickRemoveSublist(task)}>Remove Sublist</button>
         <UserList
-          valu={valu}
-          addListElem={props.addListElem}
-          tasks={tasks}
-          setTasks={props.setTasks}
-          id={props.id}
+          addListElem={addListElem}
+          tasks={getTasks}
+          setTasks={setTasks}
+          id={task.id}
+          taskTitle={taskTitle}
+          removeSublist={removeSublist}
         />
-
     </li>
   );
 }
