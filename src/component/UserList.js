@@ -1,22 +1,42 @@
 import React, { useState } from 'react';
 import Sublist from './Sublist';
 
-function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, removeTask, setUp, setDown}) {
+function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, setUp, setDown}) {
 	const [getValue, setValue] = useState('');
+	const [getIndex, setIndex] = useState(0);
+	let arr = [];
+
+	const convertToTree = (tasks) => {
+		let treeTasks = tasks;
+		treeTasks.forEach(task => {
+			if (!!task.parentId) {
+
+				treeTasks.filter(treechild => {
+					if (treechild.id === task.parentId) {
+						treechild.sublist.push(task);
+						return treechild === task;
+					}
+				});
+				return;
+			} 
+		});
+		console.log(treeTasks);
+		return treeTasks;
+  }
 
 	const changeAddTask = (e) => { 
 		setValue(e.target.value);
 	}
-	console.log(tasks);
 
 	const clickAddTask = () => {
-		addListElem({id, title: getValue});
+		addListElem({parentId: id, title: getValue, index: getIndex});
+		setIndex(index => index+=1);
 		setValue('');
 	}
 
 	return (
 		<ul className="items-li">
-			{tasks.map((task, index) => {
+			{convertToTree(tasks).map((task, index) => {
 					return (
 						<Sublist 
 						key={index}
@@ -24,7 +44,6 @@ function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, remov
 						task={task}
 						index={index}
 						tasks={tasks}
-						setTasks={setTasks}
 						addListElem={addListElem}
 						deleteSublist={deleteSublist}
 						removeTask={removeTask}

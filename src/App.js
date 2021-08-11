@@ -1,26 +1,20 @@
 import React, {useState} from 'react';
 import UserList from './component/UserList';
-import Content from './context/Content'
 import { v4 as uuidv4 } from 'uuid';
 import './App.css'
 
 function App() {
   const [tasks, setTasks] = useState([]);
 
-	const addListElem = ({tasks,  id = null, title}) => {
-
-    if (!!id) {
-      return tasks.map(task => {
-        
-        if (task.id === id) {
-          return {...task, sublist: [...task.sublist, {title: title, id: uuidv4(), parentId: id, sublist: []}]};
-        } else return {...task, sublist: addListElem({tasks: task.sublist, id, title})}; 
-      });
-    } else return [...tasks, {title: title, id: uuidv4(), parentId: id, sublist: []}]
-  }
-
-  const setItems = ({id = null, title}) => {
-    setTasks(tasks => addListElem({tasks, id, title}));
+  const setItems = ({parentId = null, title, index}) => {
+    setTasks([...tasks, {
+      index: index,
+      title: title,
+      id: uuidv4(),
+      parentId: parentId,
+      sublist: []
+    }]);
+    
   }
 
   const deleteSublist = (id) => {
@@ -51,57 +45,81 @@ function App() {
   }
 
   const setUp = (id) => {
+    // console.log(moveUp({tasks, id}));
     setTasks(tasks => [...moveUp({tasks, id})]);
   }
   
   const moveUp = ({tasks, id}) => {
-    const newTasks = tasks;
-    let count = 0;
-    tasks.map((task, idx) => { 
+   /*  let todoIndex = null;
+
+    for(let i = 0; i < tasks.length; i++){
+      if (tasks[i].id === id && todoIndex === null) {
+        todoIndex = i
+        break;
+      } else if(tasks[i].sublist && todoIndex === null){
+        moveUp({tasks: tasks[i].sublist, id})
+      }
+    }
+
+    if (todoIndex !== null) {
+      const [text] = tasks.splice(todoIndex-1, 1, tasks[todoIndex]);
+      const [test] = tasks.splice(todoIndex, 1, text);
+    }
+  
+    return [...tasks] */
+    console.log(tasks)
+    tasks.find( (task, indx, taskArr) => {
+      console.log(task, id);
       if (task.id === id) {
-        console.log(idx)
-        if (count === 0) {
-          const text = newTasks.splice(idx-1, 1, task);
-          //console.log(newTasks, 'text')
-          newTasks.splice(idx, 1, text[0]);
-          count +=1;
-          return task;
-        }
-        
-      } else return {...task, sublist: moveUp({tasks: task.sublist, id})};
-    })
-    return newTasks;
+        array_move(taskArr, indx, indx-1);
+        return false;
+      } else if(task.sublist > 0){
+         task.sublist = moveUp({task: task.sublist, id});
+         return true;
+      }
+    });
+    return tasks;
   }
 
+  function array_move(arr, old_index, new_index) {
+    if (new_index >= arr.length) {
+        var k = new_index - arr.length + 1;
+        while (k--) {
+            arr.push(undefined);
+        }
+    }
+    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+    return arr; // for testing
+};
+
   const setDown = (id) => {
-    setTasks(tasks => [...moveDown({tasks, id})]);
+    setTasks(tasks => moveDown({tasks, id}));
   }
   
   const moveDown = ({tasks, id}) => {
-    const newTasks = tasks;
-    let count = 0;
-    console.log(newTasks, tasks);
-    tasks.map((task, idx) => { 
-      console.log(task, '-', idx);
-      console.log(count, 'count')
-      if (task.id === id) {
-          const text = newTasks.splice(idx+1, 1, task);
-          console.log(text,idx);
-          newTasks.splice(idx-1, 1, text[0]);
-          count =+1;
-          console.log(newTasks, 'newTasks')
+    // const newTasks = tasks;
+    // let count = 0;
+    // console.log(newTasks, tasks);
+    // tasks.map((task, idx) => { 
+    //   console.log(task, '-', idx);
+    //   console.log(count, 'count')
+    //   if (task.id === id) {
+    //       const text = newTasks.splice(idx+1, 1, task);
+    //       console.log(text,idx);
+    //       newTasks.splice(idx-1, 1, text[0]);
+    //       count =+1;
+    //       console.log(newTasks, 'newTasks')
 
-        return task;
-      } else return {...task, sublist: moveDown({tasks: task.sublist, id})};
-    })
-    return newTasks;
+    //     return task;
+    //   } else return {...task, sublist: moveDown({tasks: task.sublist, id})};
+    // })
+    // return newTasks;
   }
 
   return (
     <div className="App">
       <UserList 
       tasks={tasks}
-      setTasks={setTasks}
       addListElem={setItems}
       deleteSublist={deleteSublist}
       removeTask={deleteTask}
