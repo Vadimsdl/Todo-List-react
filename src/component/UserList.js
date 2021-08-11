@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sublist from './Sublist';
 
-function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, removeTask, setUp}) {
+function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, removeTask, setUp, setDown}) {
 	const [getValue, setValue] = useState('');
 
 	const changeAddTask = (e) => { 
@@ -29,6 +29,7 @@ function UserList({tasks, setTasks, addListElem, id = null, deleteSublist, remov
 						deleteSublist={deleteSublist}
 						removeTask={removeTask}
 						setUp={setUp}
+						setDown={setDown}
 						/>
 					);
 				}

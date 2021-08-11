@@ -51,20 +51,50 @@ function App() {
   }
 
   const setUp = (id) => {
-    setTasks(tasks => moveUp({tasks, id}))
-    console.log(moveUp({tasks, id}))
+    setTasks(tasks => [...moveUp({tasks, id})]);
   }
   
-  const moveUp = ({tasks, id, taskNew=[]}) => {
-    const p = tasks.map((task, idx) => { 
-      console.log(task, 1);
+  const moveUp = ({tasks, id}) => {
+    const newTasks = tasks;
+    let count = 0;
+    tasks.map((task, idx) => { 
       if (task.id === id) {
-        const text = tasks.splice(idx-1, 1, task);
-        tasks.splice(idx, 1, text[0]);
-        return tasks;
+        console.log(idx)
+        if (count === 0) {
+          const text = newTasks.splice(idx-1, 1, task);
+          //console.log(newTasks, 'text')
+          newTasks.splice(idx, 1, text[0]);
+          count +=1;
+          return task;
+        }
+        
       } else return {...task, sublist: moveUp({tasks: task.sublist, id})};
     })
-    return p;
+    return newTasks;
+  }
+
+  const setDown = (id) => {
+    setTasks(tasks => [...moveDown({tasks, id})]);
+  }
+  
+  const moveDown = ({tasks, id}) => {
+    const newTasks = tasks;
+    let count = 0;
+    console.log(newTasks, tasks);
+    tasks.map((task, idx) => { 
+      console.log(task, '-', idx);
+      console.log(count, 'count')
+      if (task.id === id) {
+          const text = newTasks.splice(idx+1, 1, task);
+          console.log(text,idx);
+          newTasks.splice(idx-1, 1, text[0]);
+          count =+1;
+          console.log(newTasks, 'newTasks')
+
+        return task;
+      } else return {...task, sublist: moveDown({tasks: task.sublist, id})};
+    })
+    return newTasks;
   }
 
   return (
@@ -76,6 +106,7 @@ function App() {
       deleteSublist={deleteSublist}
       removeTask={deleteTask}
       setUp={setUp}
+      setDown={setDown}
       />
     </div>
   );
