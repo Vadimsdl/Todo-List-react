@@ -3,26 +3,7 @@ import Sublist from './Sublist';
 
 function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, setUp, setDown}) {
 	const [getValue, setValue] = useState('');
-	const [getIndex, setIndex] = useState(0);
-	let arr = [];
-
-	const convertToTree = (tasks) => {
-		let treeTasks = tasks;
-		treeTasks.forEach(task => {
-			if (!!task.parentId) {
-
-				treeTasks.filter(treechild => {
-					if (treechild.id === task.parentId) {
-						treechild.sublist.push(task);
-						return treechild === task;
-					}
-				});
-				return;
-			} 
-		});
-		console.log(treeTasks);
-		return treeTasks;
-  }
+  const [getIndex, setIndex] = useState(0);
 
 	const changeAddTask = (e) => { 
 		setValue(e.target.value);
@@ -36,7 +17,7 @@ function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, set
 
 	return (
 		<ul className="items-li">
-			{convertToTree(tasks).map((task, index) => {
+			{tasks.map((task, index) => {
 					return (
 						<Sublist 
 						key={index}
@@ -49,6 +30,8 @@ function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, set
 						removeTask={removeTask}
 						setUp={setUp}
 						setDown={setDown}
+						getIndex={getIndex}
+						setIndex={setIndex}
 						/>
 					);
 				}
