@@ -6,15 +6,37 @@ import './App.css'
 function App() {
   const [tasks, setTasks] = useState([]);
 
+  const convertToTree = (tasks) => {
+		let map = {}, node, roots = [], i;
+    let tasksClone = [...tasks];
+
+		for (i = 0; i < tasksClone.length; i++) {
+      tasksClone[i] = {...tasksClone[i]}
+			map[tasksClone[i].id] = i;
+			tasksClone[i].sublist = [];
+		}
+		
+		for (i = 0; i < tasksClone.length; i++) {
+			node = tasksClone[i];
+
+			if (!!node.parentId) {
+				tasksClone[map[node.parentId]].sublist.push(node);
+			} else {
+				roots.push(node);
+			}
+		}
+		return roots;
+  }
+
+  let tasksTree = convertToTree(tasks);
+
   const setItems = ({parentId = null, title, index}) => {
     setTasks([...tasks, {
       index: index,
       title: title,
       id: uuidv4(),
       parentId: parentId,
-      sublist: []
     }]);
-    
   }
 
   const deleteSublist = (id) => {
@@ -22,104 +44,72 @@ function App() {
   }
 
   const removeSublist = ({tasks, id}) => {
-    return tasks.map(task => {
-      if (task.id === id) {
-        return {...task, sublist: []};
-      } else return {...task, sublist: removeSublist({tasks: task.sublist, id})};
-    });
+    for (let i = 0; i < tasks.length; i++) {
+      if (tasks[i].parentId === id) {
+        removeTask({tasks: tasks, id: tasks[i].id});
+        tasks.splice(i, 1);
+        i--;
+      }
+    }
+    return [...tasks];
   }
 
   const deleteTask = (id) => {
-    setTasks(tasks => removeTask({tasks, id}));
+    setTasks(tasks => removeTask({tasks, id}));    
   }
 
   const removeTask = ({tasks, id}) => {
-    return tasks.filter(task => {
-      if (task.id === id) {
-        return false;
-      } else {
-        task.sublist = removeTask({tasks: task.sublist, id});
-        return true;
+    for (let i = 0; i < tasks.length; i++) {
+      if (tasks[i].parentId === id) {
+        removeTask({tasks: tasks, id: tasks[i].id});
+        tasks.splice(i, 1);
+        i--;
+      } else if (tasks[i].id === id) {
+        tasks.splice(i, 1);
+        i--;
       }
-    });
+    }
+    return [...tasks];
   }
 
   const setUp = (id) => {
-    // console.log(moveUp({tasks, id}));
     setTasks(tasks => [...moveUp({tasks, id})]);
   }
   
   const moveUp = ({tasks, id}) => {
-   /*  let todoIndex = null;
-
-    for(let i = 0; i < tasks.length; i++){
-      if (tasks[i].id === id && todoIndex === null) {
-        todoIndex = i
-        break;
-      } else if(tasks[i].sublist && todoIndex === null){
-        moveUp({tasks: tasks[i].sublist, id})
-      }
-    }
-
-    if (todoIndex !== null) {
-      const [text] = tasks.splice(todoIndex-1, 1, tasks[todoIndex]);
-      const [test] = tasks.splice(todoIndex, 1, text);
-    }
-  
-    return [...tasks] */
-    console.log(tasks)
-    tasks.find( (task, indx, taskArr) => {
-      console.log(task, id);
+    const cloneTasks = [...tasks];
+    cloneTasks.forEach((task, indx, taskArr) => {
       if (task.id === id) {
-        array_move(taskArr, indx, indx-1);
-        return false;
-      } else if(task.sublist > 0){
-         task.sublist = moveUp({task: task.sublist, id});
-         return true;
-      }
+        taskArr.splice(indx-1, 0, taskArr.splice(indx, 1)[0]);
+      } 
     });
-    return tasks;
+    return cloneTasks;
   }
 
-  function array_move(arr, old_index, new_index) {
-    if (new_index >= arr.length) {
-        var k = new_index - arr.length + 1;
-        while (k--) {
-            arr.push(undefined);
-        }
-    }
-    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-    return arr; // for testing
-};
-
   const setDown = (id) => {
-    setTasks(tasks => moveDown({tasks, id}));
+    setTasks(tasks => [...moveDown({tasks, id})]);
   }
   
   const moveDown = ({tasks, id}) => {
-    // const newTasks = tasks;
-    // let count = 0;
-    // console.log(newTasks, tasks);
-    // tasks.map((task, idx) => { 
-    //   console.log(task, '-', idx);
-    //   console.log(count, 'count')
-    //   if (task.id === id) {
-    //       const text = newTasks.splice(idx+1, 1, task);
-    //       console.log(text,idx);
-    //       newTasks.splice(idx-1, 1, text[0]);
-    //       count =+1;
-    //       console.log(newTasks, 'newTasks')
+    const cloneTasks = [...tasks];
 
-    //     return task;
-    //   } else return {...task, sublist: moveDown({tasks: task.sublist, id})};
-    // })
-    // return newTasks;
+    cloneTasks.forEach((task, indx, taskArr) => {
+      if (task.id === id) {
+        // taskArr.splice(indx+1, 0, taskArr.splice(indx, 1)[0]);
+        let taskMove = task.index;
+        task.index = taskArr[indx+1].index;
+        taskArr[indx+1].index = taskMove;
+        console.log(taskArr)
+      }
+    });
+    console.log(cloneTasks);
+    return cloneTasks;
   }
 
   return (
     <div className="App">
       <UserList 
-      tasks={tasks}
+      tasks={tasksTree}
       addListElem={setItems}
       deleteSublist={deleteSublist}
       removeTask={deleteTask}

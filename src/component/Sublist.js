@@ -1,28 +1,8 @@
 import React from 'react';
 import UserList from './UserList'
 
-function Sublist({index, taskTitle, task, deleteSublist, tasks, addListElem, removeTask, setUp, setDown }) {
+function Sublist({taskTitle, task, deleteSublist, tasks, addListElem, removeTask, setUp, setDown, getIndex, setIndex }) {
   let getTasks = task.sublist;
-
-  const clickRemoveTask = (task) => () => {
-    removeTask(task.id);
-  }
-
-  const clickRemoveSublist = (task) => () => {
-    deleteSublist(task.id);
-  }
-
-  /* function clickUp() {
-    setUp(task.id);
-  } */
-
-  function clickDown(id, val) {
-  
-    if ( id < tasks.length-1 ) {
-      console.log(task.id, tasks.length, id);
-      setDown(task.id);
-    }
-  }
 
   return (
     <li >
@@ -30,9 +10,9 @@ function Sublist({index, taskTitle, task, deleteSublist, tasks, addListElem, rem
       <span className="title-task">{taskTitle}</span>
       </div>
       <button className="btn" type="button" onClick={() => setUp(task.id)}>Up</button>
-      <button className="btn" type="button" onClick={() => clickDown(index, task)}>Down</button>
-      <button className="btn" type="button" onClick={clickRemoveTask(task)}>Delete</button>
-      <button className="btn" type="button" onClick={clickRemoveSublist(task)}>Remove Sublist</button>
+      <button className="btn" type="button" onClick={() => setDown(task.id)}>Down</button>
+      <button className="btn" type="button" onClick={() => removeTask(task.id)}>Delete</button>
+      <button className="btn" type="button" onClick={() => deleteSublist(task.id)}>Remove Sublist</button>
         <UserList
           addListElem={addListElem}
           tasks={getTasks}
@@ -41,7 +21,9 @@ function Sublist({index, taskTitle, task, deleteSublist, tasks, addListElem, rem
           deleteSublist={deleteSublist}
           removeTask={removeTask}
           setUp={setUp}
+          getIndex={getIndex}
           setDown={setDown}
+          setIndex={setIndex}
         />
     </li>
   );
