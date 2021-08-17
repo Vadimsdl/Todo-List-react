@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sublist from './Sublist';
 
 function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, setUp, setDown}) {
 	const [getValue, setValue] = useState('');
-  const [getIndex, setIndex] = useState(0);
+  	const [getIndex, setIndex] = useState(0);
 
 	const changeAddTask = (e) => { 
-		setValue(e.target.value);
+			setValue(e.target.value);
 	}
 
 	const clickAddTask = () => {
-		addListElem({parentId: id, title: getValue, index: getIndex});
-		setIndex(index => index+=1);
-		setValue('');
+		if (getValue !== '') {
+			addListElem({parentId: id, title: getValue, index: getIndex});
+			setIndex(index => index+=1);
+			setValue('');
+		}
 	}
 
 	return (
@@ -41,7 +43,6 @@ function UserList({tasks, addListElem, id = null, deleteSublist, removeTask, set
 					type="text"
 					name="task-name"
 					className="task-name"
-					id="task-name"
 					value={getValue}
 					onChange={changeAddTask}
 				/>
